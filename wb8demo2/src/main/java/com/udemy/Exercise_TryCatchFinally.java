@@ -12,9 +12,9 @@ public class Exercise {
             // get the user name and password from the command line args
             String username = args[0];
             String password = args[1];
-            String database = args[3];
+            String database = args[2];
             // load the MySQL Driver
-            Class.forName(database);
+            Class.forName("com.mysql.cj.jdbc.Driver");
             // 1. open a connection to the database
             // use the database URL to point to the correct database
             connection = DriverManager.getConnection(
