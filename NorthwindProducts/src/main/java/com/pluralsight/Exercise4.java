@@ -2,7 +2,7 @@ package com.pluralsight;
 
 import java.sql.*;
 
-public class Exercise3 {
+public class Exercise4 {
 
     private static final String DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
     private static final String DATABASE_URL = "jdbc:mysql://localhost:3306/northwind";
@@ -45,13 +45,13 @@ public class Exercise3 {
                     }
                     case 3 -> {
                         Console.displayDelayedString("\nDisplay all categories...\n");
-                        // method
+                        displayAllCategories();
                     }
                     case 0 -> {
                         Console.displayDelayedString("Exiting...");
                         System.exit(0);
                     }
-                    default -> System.out.println("---Invalid choice! Please try again.---");
+                    default -> System.out.println("Invalid choice! Please try again.");
                 }
             }
             catch (Exception e) {
@@ -86,24 +86,6 @@ public class Exercise3 {
             catch (SQLException e) {
                 System.out.println("Error: " + e.getMessage());
             }
-            finally {
-                if (resultSet != null) {
-                    try {
-                        resultSet.close();
-                    }
-                    catch (SQLException e) {
-                        System.out.println("Error closing ResultSet: " + e.getMessage());
-                    }
-                }
-                if (preparedStatement != null) {
-                    try {
-                        preparedStatement.close();
-                    }
-                    catch (SQLException e) {
-                        System.out.println("Error closing PreparedStatement: " + e.getMessage());
-                    }
-                }
-            }
         }
         catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -135,26 +117,69 @@ public class Exercise3 {
             catch (SQLException e) {
                 System.out.println("Error: " + e.getMessage());
             }
-            finally {
-                if (resultSet != null) {
-                    try {
-                        resultSet.close();
-                    }
-                    catch (SQLException e) {
-                        System.out.println("Error closing ResultSet: " + e.getMessage());
-                    }
-                }
-                if (preparedStatement != null) {
-                    try {
-                        preparedStatement.close();
-                    }
-                    catch (SQLException e) {
-                        System.out.println("Error closing PreparedStatement: " + e.getMessage());
-                    }
-                }
-            }
         }
         catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public static void displayAllCategories() {
+        String query = "SELECT * FROM categories ORDER BY CategoryID";
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query); ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet == null) {
+                System.out.println("Result set is null");
+                return;
+            }
+            try {
+                printHeaderCategories();
+                while (resultSet.next()) {
+                    int categoryID = resultSet.getInt("CategoryID");
+                    String categoryName = resultSet.getString("CategoryName");
+                    String description = resultSet.getString("Description");
+
+                    String info = String.format("%-11d %-35s %-40s", categoryID, categoryName, description);
+                    System.out.println(info);
+
+                }
+                int caId = Console.PromptForInt("categoryID: ");
+                query = "SELECT * FROM products WHERE CategoryID = ?";
+                try (PreparedStatement preparedStatement1 = connection.prepareStatement(query)) {
+                    preparedStatement1.setInt(1, caId);
+                    try (ResultSet resultSet1 = preparedStatement1.executeQuery()) {
+                        if (resultSet1 == null) {
+                            System.out.println("Result set is null");
+                            return;
+                        }
+                        printHeaderProducts();
+                        while (resultSet1.next()) {
+                            int productID = resultSet1.getInt("ProductID");
+                            String productName = resultSet1.getString("ProductName");
+                            double unitPrice = resultSet1.getDouble("UnitPrice");
+                            double unitsInStock = resultSet1.getDouble("UnitsInStock");
+
+                            String info1 = String.format("%-5d %-35s %-8.2f %-8.2f", productID, productName, unitPrice, unitsInStock);
+                            System.out.println(info1);
+                        }
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+
+            } catch (SQLException e) {
+                System.out.println("Error: " + e.getMessage());
+            } finally {
+                try {
+                    resultSet.close();
+                } catch (SQLException e) {
+                    System.out.println("Error closing ResultSet: " + e.getMessage());
+                }
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    System.out.println("Error closing PreparedStatement: " + e.getMessage());
+                }
+            }
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -167,6 +192,12 @@ public class Exercise3 {
 
     private static void printHeaderCustomers() {
         String header = String.format("%-35s %-35s %-20s %-20s %-20s", "Contact Name", "Company Name", "City", "Country", "Phone Number");
+        System.out.println(header);
+        System.out.println("--".repeat(65));
+    }
+
+    public static void printHeaderCategories() {
+        String header = String.format("%-5s %-35s %-40s", "Category ID", "Category Name", "Description");
         System.out.println(header);
         System.out.println("--".repeat(65));
     }
