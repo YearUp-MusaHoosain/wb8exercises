@@ -73,11 +73,8 @@ public class Exercise5_1B {
         try (BasicDataSource dataSource = getDataSource(DATABASE_URL, USER, PASSWORD);
              Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(query);
-             ResultSet resultSet = ps.executeQuery();
-             )
+             ResultSet resultSet = ps.executeQuery();)
              {
-
-
                     if (resultSet == null) {
                         System.out.println("Result set is null");
                         return;
@@ -104,7 +101,10 @@ public class Exercise5_1B {
 
     public static void displayAllCustomers() {
         String query = "SELECT * FROM customers ORDER BY country";
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query); ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (BasicDataSource dataSource = getDataSource(DATABASE_URL, USER, PASSWORD);
+             Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(query);
+             ResultSet resultSet = ps.executeQuery();) {
             try {
                 if (resultSet == null) {
                     System.out.println("Result set is null");
@@ -134,7 +134,10 @@ public class Exercise5_1B {
 
     public static void displayAllCategories() {
         String query = "SELECT * FROM categories ORDER BY CategoryID";
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query); ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (BasicDataSource dataSource = getDataSource(DATABASE_URL, USER, PASSWORD);
+             Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery();) {
             if (resultSet == null) {
                 System.out.println("Result set is null");
                 return;
