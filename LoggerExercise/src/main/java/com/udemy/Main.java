@@ -1,12 +1,12 @@
 package com.udemy;
 
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Logger;
 
 public class Main {
-    final static Logger logger = LogManager.getLogger(Main.class);
+
+    final static Logger logger = (Logger) LogManager.getLogger(Main.class);
+
     public static void main(String[] args) {
         logMeLikeYouDo("☕");
     }
