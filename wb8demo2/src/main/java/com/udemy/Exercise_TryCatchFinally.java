@@ -2,7 +2,7 @@ package com.udemy;
 
 import java.sql.*;
 
-public class Exercise {
+public class Exercise_TryCatchFinally {
     public static void main(String[] args) throws SQLException {
         Connection connection = null;
         PreparedStatement pStatement = null;
