@@ -8,7 +8,7 @@ public class Main {
     final static Logger logger = (Logger) LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
-        logMeLikeYouDo("☕");
+        logMeLikeYouDo("☕ ");
     }
     private static void logMeLikeYouDo(String input){
         if(logger.isDebugEnabled()){
