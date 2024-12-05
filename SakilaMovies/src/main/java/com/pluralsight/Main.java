@@ -1,9 +1,12 @@
 package com.pluralsight;
 
+import com.pluralsight.models.Actor;
+import com.pluralsight.models.Film;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -29,100 +32,22 @@ public class Main {
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 
-        doActorName(dataSource);
+        // Create the SakilaDataManager
+        SakilaDataManager sdbManager = new SakilaDataManager(dataSource);
 
-        doMoviesOfName(dataSource);
+        // getting actors by name
+        String actorFirstName = Console.PromptForString("What is the first name of the actor?: ");
+        String actorLastName = Console.PromptForString("What is the last name of the actor?: ");
+        List<Actor> actors = sdbManager.actorsByLastName(actorFirstName, actorLastName);
+
+        actors.forEach(System.out::println);
+
+
+        // getting list of films by actor id
+        int actorId = Console.PromptForInt("What is the actorID?: ");
+        List<Film> films = sdbManager.actorsByIDForMovies(actorId);
+
+        films.forEach(System.out::println);
     }
 
-    public static void doActorName(DataSource dataSource) {
-        try(
-                Connection connection = dataSource.getConnection();
-        )
-        {
-            System.out.print("What is the last name of the user?: ");
-            String lastName = scanner.nextLine();
-
-            try(
-                    PreparedStatement pStatement = connection.prepareStatement(
-                            "SELECT first_name, last_name \n" +
-                                    "FROM sakila.actor\n" +
-                                    "WHERE last_name = ?")
-            )
-            {
-                pStatement.setString(1, lastName);
-
-                try (
-                        ResultSet results = pStatement.executeQuery()
-                )
-                {
-                    if (results.next()){
-                        System.out.println("Your matches are: \n");
-
-                        do{
-                            String col1 = results.getString("first_name");
-                            String col2 = results.getString("last_name");
-
-                            System.out.println(col1 + " " + col2);
-                        }while (results.next());
-                    }
-                    else {
-                        System.out.println("No matches!");
-                    }
-                }
-            }
-        }
-        catch (SQLException e){
-            System.out.println("ERROR!");
-            e.printStackTrace();
-        }
-    }
-
-    public static void doMoviesOfName(DataSource dataSource) {
-
-        try (
-                Connection connection = dataSource.getConnection();
-        )
-        {
-            System.out.print("What is the first name of the user?: ");
-            String firstName = scanner.nextLine();
-
-            System.out.print("What is the last name of the user?: ");
-            String lastName = scanner.nextLine();
-
-            try (
-                    PreparedStatement preparedStatement = connection.prepareStatement(
-                            "select film.title \n" +
-                                    "FROM sakila.film\n" +
-                                    "join film_actor on film_actor.film_id = film.film_id\n" +
-                                    "join actor on actor.actor_id = film_actor.actor_id\n" +
-                                    "where actor.first_name = ? AND actor.last_name = ?;")
-            )
-            {
-                preparedStatement.setString(1, firstName);
-                preparedStatement.setString(2, lastName);
-
-                try(
-                        ResultSet results = preparedStatement.executeQuery()
-                )
-                {
-                    if (results.next()){
-                        System.out.println(firstName + " " + lastName + " are in these films: ");
-
-                        do{
-                            String col1 = results.getString("title");
-                            System.out.println(col1);
-
-                        }while (results.next());
-                    }
-                    else {
-                        System.out.println("No matches!");
-                    }
-                }
-            }
-        }
-        catch (SQLException e){
-            System.out.println("ERROR!");
-            e.printStackTrace();
-        }
-    }
 }
